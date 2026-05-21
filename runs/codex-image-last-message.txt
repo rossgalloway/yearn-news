@@ -1,0 +1,3 @@
+Saved image: `/home/dev/raaaws/yearn-news/runs/codex-yearn-news-hero.png`
+
+I used the built-in OpenAI `image_gen` tool, then copied the generated PNG into the requested repo path.

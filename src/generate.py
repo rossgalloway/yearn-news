@@ -61,7 +61,7 @@ def render_vault_list(vaults: list[dict[str, Any]]) -> list[str]:
     for v in vaults:
         url = f"https://yearn.fi/v3/{v['chain_id']}/{v['address']}"
         lines.append(
-            f"- [**{v['name']}**]({url}) ({v['chain']}): **{v['apr']:.2f}%** APR | {fmt_usd(v['tvl_usd'])} TVL"
+            f"- [**{v['name']}**]({url}) ({v['chain']}): **{v['apr']:.2f}%** APY | {fmt_usd(v['tvl_usd'])} TVL"
         )
     return lines
 
