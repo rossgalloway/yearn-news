@@ -139,6 +139,19 @@ def resolve_kong_preferred_apy_pct(kong_vault: dict[str, Any]) -> tuple[float | 
     return oracle_net_apy * 100, "oracle.netAPY"
 
 
+def resolve_kong_historical_apy_pct(kong_vault: dict[str, Any]) -> float | None:
+    performance = kong_vault.get("performance", {}) or {}
+    historical = performance.get("historical", {}) or {}
+    monthly_net = normalize_number(historical.get("monthlyNet"))
+    if monthly_net is not None:
+        return monthly_net * 100
+
+    net = normalize_number(historical.get("net"))
+    if net is not None:
+        return net * 100
+    return None
+
+
 def resolve_katana_reward_pct(kong_vault: dict[str, Any]) -> float:
     performance = kong_vault.get("performance", {}) or {}
     estimated = performance.get("estimated", {}) or {}
@@ -147,18 +160,20 @@ def resolve_katana_reward_pct(kong_vault: dict[str, Any]) -> float:
         normalize_number(components.get("katanaAppRewardsAPR")),
         normalize_number(components.get("fixedRateKatanaRewards")),
         normalize_number(components.get("FixedRateKatanaRewards")),
-        normalize_number(components.get("katanaBonusAPY")),
     ]
     return sum(part for part in reward_parts if part is not None) * 100
 
 
 def should_include_kong_vault(kong_vault: dict[str, Any]) -> bool:
     address = str(kong_vault.get("address", "")).lower()
+    is_yvusd = is_yvusd_address(address)
+    if not is_yvusd and kong_vault.get("isHighlighted") is not True:
+        return False
     if kong_vault.get("v3") is not True:
         return False
     if str(kong_vault.get("origin") or "") != "yearn":
         return False
-    if is_yvusd_address(address):
+    if is_yvusd:
         return True
     if str(kong_vault.get("kind") or "") != "Multi Strategy":
         return False
@@ -188,6 +203,9 @@ def build_vault_from_kong(
     apr_pct, apy_source = resolve_kong_preferred_apy_pct(kong_vault)
     if apr_pct is not None and normalized_chain_id == KATANA_CHAIN_ID and apy_source != "estimated.apy":
         apr_pct += resolve_katana_reward_pct(kong_vault)
+    historical_apy_pct = resolve_kong_historical_apy_pct(kong_vault)
+    if historical_apy_pct is not None and normalized_chain_id == KATANA_CHAIN_ID:
+        historical_apy_pct += resolve_katana_reward_pct(kong_vault)
 
     if apr_pct is None and fallback:
         apr_pct = normalize_number(fallback.get("apr"))
@@ -204,6 +222,7 @@ def build_vault_from_kong(
         "chain_id": normalized_chain_id,
         "address": kong_vault.get("address") or (fallback or {}).get("address"),
         "apr": apr_pct,
+        "historical_apy": historical_apy_pct,
         "tvl_usd": tvl_usd,
     }
 
@@ -403,8 +422,6 @@ def get_data() -> dict[str, Any]:
 
     usd_vaults: list[dict[str, Any]] = []
     crypto_vaults: list[dict[str, Any]] = []
-    seen_addresses: set[str] = set()
-
     for kong_vault in kong_vaults:
         built_vault = build_vault_from_kong(kong_vault, fallback_by_address)
         if built_vault is None:
@@ -413,18 +430,10 @@ def get_data() -> dict[str, Any]:
         fallback = fallback_by_address.get(address)
         asset = kong_vault.get("asset", {}) if isinstance(kong_vault.get("asset"), dict) else {}
         bucket = get_vault_bucket(built_vault["name"], asset.get("symbol"), fallback)
-        seen_addresses.add(address)
         built_vault["bucket"] = bucket
         if bucket == "crypto":
             crypto_vaults.append(built_vault)
         else:
             usd_vaults.append(built_vault)
-
-    for fallback in usd_fallbacks:
-        if str(fallback["address"]).lower() not in seen_addresses:
-            usd_vaults.append(fallback)
-    for fallback in crypto_fallbacks:
-        if str(fallback["address"]).lower() not in seen_addresses:
-            crypto_vaults.append(fallback)
 
     return sort_and_slice_vaults(usd_vaults, crypto_vaults)

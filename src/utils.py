@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 from urllib.request import urlopen
@@ -42,6 +42,17 @@ def get_week_and_year() -> tuple[int, int]:
         first_friday = first_friday.replace(day=first_friday.day + 1)
     days_since = (today - first_friday).days
     return max(1, (days_since // 7) + 1), today.year
+
+
+def get_report_monday(today: date | None = None) -> date:
+    """Return the Monday for the report's current week."""
+    today = today or date.today()
+    return today - timedelta(days=today.weekday())
+
+
+def format_report_period(report_monday: date) -> str:
+    """Format the report week as 'Week of Month day, year'."""
+    return f"Week of {report_monday.strftime('%B')} {report_monday.day}, {report_monday.year}"
 
 
 def is_previous_week(prev: dict[str, Any] | None, week: int, year: int) -> bool:

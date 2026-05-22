@@ -39,10 +39,15 @@
 
 Run:
 ```shell
-python src/generate.py
+uv run python src/generate.py
 ```
 
-Output is written to `output.md` in Markdown format.
+Generated output:
+
+- `output.md` - Markdown source for archival/editing
+- `output-x-article.html` - rich-text browser view with a copy button for X Articles
+- `output-x-article-fragment.html` - body-only HTML for paste automation
+- `output-x-article.txt` - Markdown-free plain text fallback
 
 ## Code Style
 

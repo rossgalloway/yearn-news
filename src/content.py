@@ -2,22 +2,21 @@
 # THE BLUE PILL - WEEKLY NEWSLETTER CONTENT
 # ============================================================
 # Edit the text below to customize each section.
-# Variables like {week}, {year}, {tvl}, etc. are auto-filled.
+# Variables like {period}, {week}, {year}, {tvl}, etc. are auto-filled.
 # ============================================================
 
 # ------------------------------------------------------------
 # OVERVIEW
 # ------------------------------------------------------------
 OVERVIEW = """
-Welcome to **The Blue Pill** - *Week {week}, {year}*. A weekly update covering what's been happening across the Yearn ecosystem.
+Welcome to **The Blue Pill** for *{period}*. A weekly update covering what's been happening across the Yearn ecosystem.
 
 This newsletter is meant to be a simple summary of recent activity: governance discussions, vault performance, a few protocol-level metrics, and once in a while some alpha we can share. We hope you'll find it useful!
 
 Time seems to be moving faster than ever, but work at Yearn continues steadily. Our agenda for today:
 - **Yearn at a glance** - high-level protocol metrics, including TVL and week-over-week changes
 - **Vaults** - top yields across chains
-- **yCRV** - this week's fees and week-over-week changes
-- **yYB** - this week's fees and week-over-week changes
+- **Liquid Lockers** - this week's yCRV and yYB fees and week-over-week changes
 - **Alpha Corner** - features and strategies in development
 """
 
@@ -28,24 +27,22 @@ VAULTS = """
 """
 
 # ------------------------------------------------------------
-# yCRV
+# LIQUID LOCKERS
 # ------------------------------------------------------------
-YCRV = """
-This week yCRV stakers received **{rewards} crvUSD** rewards, compared to **{prev_rewards} crvUSD** in the prior week, for a week-over-week change of **{wow}%**
-"""
-
-# ------------------------------------------------------------
-# yYB
-# ------------------------------------------------------------
-YYB = """
-This week yYB stakers received **{rewards} crvUSD** rewards, compared to **{prev_rewards} crvUSD** in the prior week, for a week-over-week change of **{wow}%**
+LIQUID_LOCKERS = """
 """
 
 # ------------------------------------------------------------
 # ALPHA CORNER
 # ------------------------------------------------------------
 ALPHA = """
-No Alpha today. Come back next week!
+Enso powers smoother cross-asset and cross-chain vault UX.<br>https://x.com/yearnfi/status/2057844782483882301
+
+Yearn avoids upgradeable proxies. Here's why.<br>https://x.com/yearnfi/status/2057084200327737456
+
+Flex is live!<br>https://x.com/yearnfi/status/2056737704251904373
+
+yvUSD crossed $10M TVL.<br>https://x.com/yearnfi/status/2054909725054239152
 """
 
 # ------------------------------------------------------------

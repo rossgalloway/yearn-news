@@ -43,7 +43,9 @@ docker exec objective_robinson bash -c "cd /projects && uv run python src/genera
 - Newsletter vault rows should use Kong as the primary source.
 - Kong APY for output should prefer `performance.estimated.apy` when present, then fall back to `performance.oracle.netAPY`.
 - For Katana vaults without `performance.estimated.apy`, add reward components on top of the oracle-derived base.
-- Do not use Kong top-level `apy.net` or `performance.historical` for the vault row APY display.
+- Show Kong `performance.historical.monthlyNet` as the separate Historical APY value, falling back to `performance.historical.net` only when monthly net is missing.
+- For Katana vault Historical APY, add reward components on top of the Kong historical base, mirroring the estimated APY fallback behavior.
+- Do not use Kong top-level `apy.net` or `performance.historical` for sorting or the primary vault row APY display.
 - If Kong is unavailable or a vault is missing usable Kong APY/TVL data, fall back to the direct query path in `src/vaults.py`.
 - Vault row text in the generated article should say `APY`, not `APR`.
 
@@ -52,6 +54,7 @@ docker exec objective_robinson bash -c "cd /projects && uv run python src/genera
 Keep the newsletter vault list scoped to:
 
 - `v3 == true`
+- `isHighlighted == true`, except the yvUSD and Locked yvUSD addresses are explicitly allowed
 - `kind == "Multi Strategy"`
 - `origin == "yearn"`
 - names matching the current editorial scope in `src/vaults.py`
@@ -66,7 +69,12 @@ Data is cached in `data/` with week/year tracking for WoW comparisons:
 
 ## Output
 
-Generates `output.md` in Markdown format for copy-paste to the publication platform.
+Generates:
+
+- `output.md` - Markdown source for archival/editing
+- `output-x-article.html` - rich-text browser view with a copy button for X Articles
+- `output-x-article-fragment.html` - body-only HTML for paste automation
+- `output-x-article.txt` - Markdown-free plain text fallback
 
 ## Development workflow
 
