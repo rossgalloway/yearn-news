@@ -122,8 +122,7 @@ def format_banner_vault(vault: dict[str, Any] | None) -> tuple[str, str]:
     if not vault:
         return "N/A", "Coming soon"
     name = str(vault["name"]).replace(" yVault", "")
-    chain = str(vault["chain"]).title()
-    return f"{vault['apr']:.2f}%", f"{name} ({chain})"
+    return f"{vault['apr']:.2f}%", name
 
 
 def render_glance_banner_svg(week: int, year: int, tvl_data: dict[str, Any], vaults_data: dict[str, Any]) -> str:

@@ -381,10 +381,12 @@ class GenerateFormattingTests(unittest.TestCase):
         self.assertIn("Top Stable Vault", svg)
         self.assertIn("Top Volatile Vault", svg)
         self.assertIn("$243.2M", svg)
-        self.assertIn("vbUSDT (Katana)", svg)
+        self.assertIn("vbUSDT", svg)
         self.assertIn("8.81%", svg)
-        self.assertIn("SKY-1 (Mainnet)", svg)
+        self.assertIn("SKY-1", svg)
         self.assertIn("4.71%", svg)
+        self.assertNotIn("(Katana)", svg)
+        self.assertNotIn("(Mainnet)", svg)
         self.assertIn('width="600" height="120"', svg)
         self.assertIn('x1="178.25"', svg)
         self.assertNotIn("Top Vault APY", svg)
@@ -413,11 +415,11 @@ class GenerateFormattingTests(unittest.TestCase):
         self.assertEqual(row_nodes[1].attrib["x"], "195")
         self.assertEqual(
             [tspan.text for tspan in row_nodes[0].findall("svg:tspan", namespace)],
-            ["Top Stable Vault: ", "vbUSDT (Katana)", " | 8.50%"],
+            ["Top Stable Vault: ", "vbUSDT", " | 8.50%"],
         )
         self.assertEqual(
             [tspan.text for tspan in row_nodes[1].findall("svg:tspan", namespace)],
-            ["Top Volatile Vault: ", "Very Long Volatile (Mainnet)", " | 12.09%"],
+            ["Top Volatile Vault: ", "Very Long Volatile", " | 12.09%"],
         )
         self.assertLess(float(row_nodes[0].attrib["y"]), float(row_nodes[1].attrib["y"]))
 

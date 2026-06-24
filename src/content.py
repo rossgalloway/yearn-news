@@ -36,20 +36,14 @@ LIQUID_LOCKERS = """
 # ALPHA CORNER
 # ------------------------------------------------------------
 ALPHA = """
-Enso powers smoother cross-asset and cross-chain vault UX.<br>https://x.com/yearnfi/status/2057844782483882301
-
-Yearn avoids upgradeable proxies. Here's why.<br>https://x.com/yearnfi/status/2057084200327737456
-
-Flex is live!<br>https://x.com/yearnfi/status/2056737704251904373
-
-yvUSD crossed $10M TVL.<br>https://x.com/yearnfi/status/2054909725054239152
+vbUSDC shares are not 1:1 with USDC.<br>https://x.com/yearnfi/status/2064348424242340024
 """
 
 # ------------------------------------------------------------
 # DISCLAIMER
 # ------------------------------------------------------------
 DISCLAIMER = """
-All data presented in this newsletter is based on publicly available sources and onchain information at the time of generation. The scripts used to collect and generate this data are open source and available [here](https://github.com/johnnyonline/yearn-news).
+All data presented in this newsletter is based on publicly available sources and onchain information at the time of generation. The scripts used to collect and generate this data are open source and available [here](https://github.com/rossgalloway/yearn-news).
 """
 
 # ------------------------------------------------------------
