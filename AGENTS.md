@@ -75,15 +75,45 @@ Generates:
 - `output-x-article.html` - rich-text browser view with a copy button for X Articles
 - `output-x-article-fragment.html` - body-only HTML for paste automation
 - `output-x-article.txt` - Markdown-free plain text fallback
+- `output-yearn-glance-banner.svg` - 600x120 Yearn at a Glance banner for X Articles
+- `output-yearn-glance-banner-review.html` - browser review page for the generated banner
+
+## Alpha Corner workflow
+
+Use `docs/tweet-alpha-workflow.md` when refreshing Alpha Corner.
+
+Current expectations:
+
+- Use the start of the last full week as the lower bound unless the user gives a different date.
+- Include Yearn-authored tweets and quote-tweets only.
+- Exclude vanilla retweets, low-context replies, and posts older than the cutoff.
+- Prefer short punchy blurbs plus raw X links.
+- If Hermes, `xurl`, or public mirrors are unavailable, keep Alpha conservative and note the limitation.
+
+## Preview workflow
+
+At the end of a turn that changes generated output or docs, provide a working preview link when one is available.
+
+This repo can be served as static files from the repo root, for example:
+
+```bash
+python3 -m http.server 4212 --bind 127.0.0.1
+```
+
+Then verify and share the relevant local or private preview URLs for the files being reviewed, usually:
+
+- `output-x-article.html`
+- `output-yearn-glance-banner.svg`
+- `output-yearn-glance-banner-review.html`
 
 ## Development workflow
 
 Before finishing changes:
 
 ```bash
-python -m unittest discover -s tests -v
-python -m mypy src tests
-ruff check .
+uv run python -m unittest discover -s tests -v
+uv run python -m mypy src tests
+uv run ruff check .
 ```
 
 Use Python 3.12 and keep the implementation simple and explicit.

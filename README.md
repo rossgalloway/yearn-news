@@ -8,7 +8,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/johnnyonline/yearn-news.git
+   git clone https://github.com/rossgalloway/yearn-news.git
    cd yearn-news
    ```
 
@@ -48,22 +48,24 @@ Generated output:
 - `output-x-article.html` - rich-text browser view with a copy button for X Articles
 - `output-x-article-fragment.html` - body-only HTML for paste automation
 - `output-x-article.txt` - Markdown-free plain text fallback
+- `output-yearn-glance-banner.svg` - 600x120 Yearn at a Glance banner for X Articles
+- `output-yearn-glance-banner-review.html` - browser review page for the generated banner
 
 ## Code Style
 
 Format and lint code with ruff:
 ```bash
 # Format code
-ruff format .
+uv run ruff format .
 
 # Lint code
-ruff check .
+uv run ruff check .
 
 # Fix fixable lint issues
-ruff check --fix .
+uv run ruff check --fix .
 ```
 
 Type checking with mypy:
 ```bash
-mypy .
+uv run python -m mypy src tests
 ```

@@ -137,4 +137,4 @@ uv run python -m mypy src tests
 uv run ruff check .
 ```
 
-Then provide the X article preview link from the active Tailscale preview.
+Then provide the X article preview link when a local or private preview is available.
