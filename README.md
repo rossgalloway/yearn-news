@@ -1,9 +1,5 @@
 # Yearn News
 
-## Get Pilled
-
-[**The Blue Pill**](https://news.yearn.fi/)
-
 ## Installation
 
 1. **Clone the repository**
