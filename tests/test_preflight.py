@@ -54,7 +54,10 @@ class PreflightTests(unittest.TestCase):
         web3 = MagicMock()
         web3.eth.chain_id = 1
 
-        with patch("preflight.get_web3", return_value=web3):
+        with (
+            patch.dict(utils.CHAINS["mainnet"], {"rpc": "https://example.invalid"}),
+            patch("preflight.get_web3", return_value=web3),
+        ):
             result = preflight.check_rpc("mainnet", required=True)
 
         self.assertEqual(result.status, "ready")
