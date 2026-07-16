@@ -1,8 +1,10 @@
 import json
 import os
+import time
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
+from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
 from dotenv import load_dotenv
@@ -11,6 +13,8 @@ from web3 import Web3
 load_dotenv()
 
 DATA_DIR = Path(__file__).parent.parent / "data"
+HTTP_TIMEOUT_SECONDS = 15.0
+HTTP_RETRIES = 2
 
 # Chain configs
 CHAINS = {
@@ -114,28 +118,69 @@ def save_cache(name: str, data: dict[str, Any]) -> None:
     path.write_text(json.dumps(history, indent=2))
 
 
-def fetch_json(url: str) -> dict[str, Any]:
-    with urlopen(url) as r:
-        return dict(json.loads(r.read().decode()))
+class DataSourceError(RuntimeError):
+    """Raised when an external data source cannot be read."""
+
+
+def fetch_json_data(
+    url: str,
+    *,
+    source: str | None = None,
+    timeout: float = HTTP_TIMEOUT_SECONDS,
+    retries: int = HTTP_RETRIES,
+) -> Any:
+    """Fetch JSON with a timeout, bounded retries, and source-aware errors."""
+    label = source or url
+    last_error: Exception | None = None
+
+    for attempt in range(retries + 1):
+        try:
+            with urlopen(url, timeout=timeout) as response:
+                return json.loads(response.read().decode())
+        except (HTTPError, URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
+            last_error = exc
+            if attempt < retries:
+                time.sleep(0.5 * (2**attempt))
+
+    raise DataSourceError(f"Unable to fetch {label} after {retries + 1} attempts: {last_error}") from last_error
+
+
+def fetch_json(url: str, *, source: str | None = None) -> dict[str, Any]:
+    data = fetch_json_data(url, source=source)
+    if not isinstance(data, dict):
+        raise DataSourceError(f"Expected an object from {source or url}, received {type(data).__name__}")
+    return dict(data)
 
 
 def fetch_eth_price() -> float:
-    data = fetch_json("https://coins.llama.fi/prices/current/coingecko:ethereum")
+    data = fetch_json(
+        "https://coins.llama.fi/prices/current/coingecko:ethereum",
+        source="DeFiLlama ETH price",
+    )
     return float(data["coins"]["coingecko:ethereum"]["price"])
 
 
 def fetch_btc_price() -> float:
-    data = fetch_json("https://coins.llama.fi/prices/current/coingecko:bitcoin")
+    data = fetch_json(
+        "https://coins.llama.fi/prices/current/coingecko:bitcoin",
+        source="DeFiLlama BTC price",
+    )
     return float(data["coins"]["coingecko:bitcoin"]["price"])
 
 
 def fetch_sky_price() -> float:
-    data = fetch_json("https://coins.llama.fi/prices/current/ethereum:0x56072C95FAA701256059aa122697B133aDEd9279")
+    data = fetch_json(
+        "https://coins.llama.fi/prices/current/ethereum:0x56072C95FAA701256059aa122697B133aDEd9279",
+        source="DeFiLlama SKY price",
+    )
     return float(data["coins"]["ethereum:0x56072C95FAA701256059aa122697B133aDEd9279"]["price"])
 
 
 def fetch_yyb_price() -> float:
-    data = fetch_json("https://coins.llama.fi/prices/current/ethereum:0x22222222aEA0076fCA927a3f44dc0B4FdF9479D6")
+    data = fetch_json(
+        "https://coins.llama.fi/prices/current/ethereum:0x22222222aEA0076fCA927a3f44dc0B4FdF9479D6",
+        source="DeFiLlama yYB price",
+    )
     return float(data["coins"]["ethereum:0x22222222aEA0076fCA927a3f44dc0B4FdF9479D6"]["price"])
 
 
@@ -167,7 +212,7 @@ def get_web3(chain: str) -> Web3:
     rpc = CHAINS[chain]["rpc"]
     if not rpc:
         raise ValueError(f"RPC URL not configured for {chain}")
-    return Web3(Web3.HTTPProvider(str(rpc)))
+    return Web3(Web3.HTTPProvider(str(rpc), request_kwargs={"timeout": HTTP_TIMEOUT_SECONDS}))
 
 
 def multicall(w3: Web3, calls: list[tuple[str, bytes]]) -> list[tuple[bool, bytes]]:

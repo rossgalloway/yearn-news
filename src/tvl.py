@@ -1,30 +1,42 @@
 from typing import Any
-from urllib.request import urlopen
 
-from utils import fetch_eth_price, get_previous_week_data, get_week_and_year, save_cache
+from utils import (
+    DataSourceError,
+    fetch_eth_price,
+    fetch_json_data,
+    get_previous_week_data,
+    get_week_and_year,
+    save_cache,
+)
 
 CACHE_NAME = "tvl"
 
 
 def fetch_yearn_tvl() -> float:
-    with urlopen("https://api.llama.fi/tvl/yearn") as r:
-        return float(r.read().decode())
+    data = fetch_json_data("https://api.llama.fi/tvl/yearn", source="DeFiLlama Yearn TVL")
+    if not isinstance(data, (int, float)):
+        raise DataSourceError(f"Expected a number from DeFiLlama Yearn TVL, received {type(data).__name__}")
+    return float(data)
 
 
 def fetch_defi_tvl() -> float:
-    import json
-
-    with urlopen("https://api.llama.fi/v2/historicalChainTvl") as r:
-        data: list[dict[str, Any]] = json.loads(r.read().decode())
-        return float(data[-1]["tvl"])
+    data = fetch_json_data("https://api.llama.fi/v2/historicalChainTvl", source="DeFiLlama total DeFi TVL")
+    if not isinstance(data, list) or not data or not isinstance(data[-1], dict):
+        raise DataSourceError("Expected a non-empty list from DeFiLlama total DeFi TVL")
+    return float(data[-1]["tvl"])
 
 
 def fetch_yield_aggregator_tvl() -> float:
-    import json
-
-    with urlopen("https://api.llama.fi/protocols") as r:
-        data: list[dict[str, Any]] = json.loads(r.read().decode())
-        return float(sum(p.get("tvl") or 0 for p in data if p.get("category") == "Yield Aggregator"))
+    data = fetch_json_data("https://api.llama.fi/protocols", source="DeFiLlama protocol list")
+    if not isinstance(data, list):
+        raise DataSourceError(f"Expected a list from DeFiLlama protocol list, received {type(data).__name__}")
+    return float(
+        sum(
+            protocol.get("tvl") or 0
+            for protocol in data
+            if isinstance(protocol, dict) and protocol.get("category") == "Yield Aggregator"
+        )
+    )
 
 
 def get_data() -> dict[str, Any]:

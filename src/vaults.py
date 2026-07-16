@@ -1,6 +1,4 @@
-import json
 from typing import Any
-from urllib.request import urlopen
 
 from utils import (
     APR_ORACLE_ADDRESS,
@@ -8,6 +6,7 @@ from utils import (
     REGISTRY_ADDRESSES,
     fetch_btc_price,
     fetch_eth_price,
+    fetch_json_data,
     fetch_sky_price,
     fetch_yyb_price,
     get_web3,
@@ -79,8 +78,7 @@ EXCLUDED_VAULTS = {
 
 
 def fetch_json_value(url: str) -> Any:
-    with urlopen(url) as response:
-        return json.loads(response.read().decode())
+    return fetch_json_data(url, source=url)
 
 
 def normalize_number(value: Any) -> float | None:

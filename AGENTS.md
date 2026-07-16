@@ -61,11 +61,11 @@ Keep the newsletter vault list scoped to:
 
 ## Caching
 
-Data is cached in `data/` with week/year tracking for WoW comparisons:
+TVL data is cached in `data/` with week/year tracking for WoW comparisons:
 
 - `tvl_cache.json`
-- `ycrv_cache.json`
-- `yyb_cache.json`
+
+The existing `ycrv_cache.json` and `yyb_cache.json` files are legacy snapshots. Current yCRV and yYB comparisons are read directly from the current and prior RewardDistributor weeks.
 
 ## Output
 
@@ -81,6 +81,7 @@ Generates:
 ## Alpha Corner workflow
 
 Use `docs/tweet-alpha-workflow.md` when refreshing Alpha Corner.
+Use `docs/weekly-generation-workflow.md` for the complete weekly source, generation, QA, and publication checklist.
 
 Current expectations:
 
@@ -111,6 +112,7 @@ Then verify and share the relevant local or private preview URLs for the files b
 Before finishing changes:
 
 ```bash
+uv run ruff format . --check
 uv run python -m unittest discover -s tests -v
 uv run python -m mypy src tests
 uv run ruff check .

@@ -1,67 +1,90 @@
 # Yearn News
 
-## Installation
+Weekly generator for **The Blue Pill**, covering Yearn protocol metrics, vault yields, liquid-locker rewards, and editorial updates.
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/rossgalloway/yearn-news.git
-   cd yearn-news
-   ```
+## Quick start
 
-2. **Set up virtual environment**
-   ```bash
-   uv venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
+Requirements:
 
-3. **Install dependencies**
-   ```bash
-   # Install all dependencies
-   uv sync
-   ```
+- Python 3.12
+- [`uv`](https://docs.astral.sh/uv/)
+- RPC endpoints for Ethereum mainnet, Arbitrum, Base, and Katana
+- Internet access to Kong, Katana reward services, and DeFiLlama
 
-   > Note: This project uses [uv](https://github.com/astral-sh/uv) for faster dependency installation. If you don't have uv installed, you can install it with `pip install uv` or follow the [installation instructions](https://github.com/astral-sh/uv#installation).
+```bash
+git clone https://github.com/rossgalloway/yearn-news.git
+cd yearn-news
+uv sync
+cp .env.example .env
+```
 
-4. **Environment setup**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your API keys and configuration
+Fill in `.env`:
 
-   # Load environment variables into your shell session
-   export $(grep -v '^#' .env | xargs)
-   ```
+```dotenv
+RPC_MAINNET="https://..."
+RPC_ARBITRUM="https://..."
+RPC_BASE="https://..."
+RPC_KATANA="https://..."
+```
 
-## Usage
+`RPC_MAINNET` is required for liquid-locker rewards. The other RPCs provide complete onchain vault fallback coverage when Kong data is unavailable or incomplete.
 
-Run:
-```shell
+## Check readiness
+
+Run the read-only preflight before generating:
+
+```bash
+uv run python src/preflight.py
+```
+
+It checks required HTTP sources, RPC connectivity, expected chain IDs, and optional fallback services. It does not modify caches or generated output.
+
+## Generate
+
+Follow the complete weekly checklist in [`docs/weekly-generation-workflow.md`](docs/weekly-generation-workflow.md), then run:
+
+```bash
 uv run python src/generate.py
 ```
 
 Generated output:
 
-- `output.md` - Markdown source for archival/editing
-- `output-x-article.html` - rich-text browser view with a copy button for X Articles
-- `output-x-article-fragment.html` - body-only HTML for paste automation
-- `output-x-article.txt` - Markdown-free plain text fallback
-- `output-yearn-glance-banner.svg` - 600x120 Yearn at a Glance banner for X Articles
-- `output-yearn-glance-banner-review.html` - browser review page for the generated banner
+- `output.md` — Markdown source for archival and editing
+- `output-x-article.html` — browser review with rich-text copy support
+- `output-x-article-fragment.html` — body-only HTML for paste automation
+- `output-x-article.txt` — plain-text fallback
+- `output-yearn-glance-banner.svg` — 600×120 Yearn at a Glance banner
+- `output-yearn-glance-banner-review.html` — banner review page
 
-## Code Style
+Generation updates `data/tvl_cache.json`, which supplies the prior-week TVL comparison. On a fresh clone without a preceding weekly entry, the first article displays current values without a week-over-week comparison.
 
-Format and lint code with ruff:
+## Review locally
+
+Serve the repository root:
+
 ```bash
-# Format code
-uv run ruff format .
+python3 -m http.server 4212 --bind 127.0.0.1
+```
 
-# Lint code
+Then review:
+
+- `http://127.0.0.1:4212/output-x-article.html`
+- `http://127.0.0.1:4212/output-yearn-glance-banner-review.html`
+- `http://127.0.0.1:4212/output-yearn-glance-banner.svg`
+
+## Validate changes
+
+```bash
+uv run ruff format . --check
 uv run ruff check .
-
-# Fix fixable lint issues
-uv run ruff check --fix .
-```
-
-Type checking with mypy:
-```bash
 uv run python -m mypy src tests
+uv run python -m unittest discover -s tests -v
 ```
+
+To apply formatting:
+
+```bash
+uv run ruff format .
+```
+
+The same checks run in CI.

@@ -369,8 +369,9 @@ class VaultsKongSourcingTests(unittest.TestCase):
             "bucket": "usd",
         }
 
-        with patch("vaults.fetch_kong_vaults", return_value=[kong_vault]), patch(
-            "vaults.collect_onchain_vaults", return_value=([fallback], [])
+        with (
+            patch("vaults.fetch_kong_vaults", return_value=[kong_vault]),
+            patch("vaults.collect_onchain_vaults", return_value=([fallback], [])),
         ):
             result = vaults.get_data()
 
@@ -382,8 +383,9 @@ class VaultsKongSourcingTests(unittest.TestCase):
             "top_crypto": [{"name": "WETH-1 yVault", "apr": 1.77, "tvl_usd": 2000.0}],
         }
 
-        with patch("vaults.fetch_kong_vaults", side_effect=RuntimeError("kong down")), patch(
-            "vaults.get_data_onchain", return_value=fallback_payload
+        with (
+            patch("vaults.fetch_kong_vaults", side_effect=RuntimeError("kong down")),
+            patch("vaults.get_data_onchain", return_value=fallback_payload),
         ):
             result = vaults.get_data()
 
@@ -548,7 +550,7 @@ class GenerateFormattingTests(unittest.TestCase):
         )
 
         self.assertIn(
-            '<h2>Yearn at a glance</h2>\n'
+            "<h2>Yearn at a glance</h2>\n"
             '<figure class="glance-banner"><img src="output-yearn-glance-banner.svg?v=abc123" '
             'alt="Yearn at a glance banner"></figure>\n'
             "<p>Yearn TVL: <strong>$245.9M</strong>.</p>",
