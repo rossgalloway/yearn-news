@@ -22,6 +22,8 @@ MULTI_STRATEGY_TYPE = 1
 KATANA_CHAIN_ID = 747474
 YVUSD_UNLOCKED_ADDRESS = "0x696d02db93291651ed510704c9b286841d506987"
 YVUSD_LOCKED_ADDRESS = "0xaaafea48472f77563961cdb53291dedfb46f9040"
+YBOLD_ADDRESS = "0x9f4330700a36b29952869fac9b33f45eedd8a3d8"
+YSYBOLD_ADDRESS = "0x23346b04a7f55b8760e5860aa5a77383d63491cd"
 
 CHAIN_NAMES = {
     1: "mainnet",
@@ -164,6 +166,15 @@ def resolve_katana_reward_pct(kong_vault: dict[str, Any]) -> float:
     return sum(part for part in reward_parts if part is not None) * 100
 
 
+def resolve_kong_performance_source(
+    kong_vault: dict[str, Any], kong_by_address: dict[str, dict[str, Any]] | None
+) -> dict[str, Any]:
+    address = str(kong_vault.get("address", "")).lower()
+    if address == YBOLD_ADDRESS and kong_by_address:
+        return kong_by_address.get(YSYBOLD_ADDRESS, kong_vault)
+    return kong_vault
+
+
 def should_include_kong_vault(kong_vault: dict[str, Any]) -> bool:
     address = str(kong_vault.get("address", "")).lower()
     is_yvusd = is_yvusd_address(address)
@@ -181,7 +192,9 @@ def should_include_kong_vault(kong_vault: dict[str, Any]) -> bool:
 
 
 def build_vault_from_kong(
-    kong_vault: dict[str, Any], fallback_by_address: dict[str, dict[str, Any]]
+    kong_vault: dict[str, Any],
+    fallback_by_address: dict[str, dict[str, Any]],
+    kong_by_address: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any] | None:
     address = str(kong_vault.get("address", "")).lower()
     fallback = fallback_by_address.get(address)
@@ -200,12 +213,13 @@ def build_vault_from_kong(
     if normalized_chain_id is None or chain_name is None:
         return fallback
 
-    apr_pct, apy_source = resolve_kong_preferred_apy_pct(kong_vault)
+    performance_source = resolve_kong_performance_source(kong_vault, kong_by_address)
+    apr_pct, apy_source = resolve_kong_preferred_apy_pct(performance_source)
     if apr_pct is not None and normalized_chain_id == KATANA_CHAIN_ID and apy_source != "estimated.apy":
-        apr_pct += resolve_katana_reward_pct(kong_vault)
-    historical_apy_pct = resolve_kong_historical_apy_pct(kong_vault)
+        apr_pct += resolve_katana_reward_pct(performance_source)
+    historical_apy_pct = resolve_kong_historical_apy_pct(performance_source)
     if historical_apy_pct is not None and normalized_chain_id == KATANA_CHAIN_ID:
-        historical_apy_pct += resolve_katana_reward_pct(kong_vault)
+        historical_apy_pct += resolve_katana_reward_pct(performance_source)
 
     if apr_pct is None and fallback:
         apr_pct = normalize_number(fallback.get("apr"))
@@ -419,11 +433,12 @@ def get_data() -> dict[str, Any]:
 
     usd_fallbacks, crypto_fallbacks = collect_onchain_vaults()
     fallback_by_address = index_fallback_vaults(usd_fallbacks, crypto_fallbacks)
+    kong_by_address = {str(vault.get("address", "")).lower(): vault for vault in kong_vaults}
 
     usd_vaults: list[dict[str, Any]] = []
     crypto_vaults: list[dict[str, Any]] = []
     for kong_vault in kong_vaults:
-        built_vault = build_vault_from_kong(kong_vault, fallback_by_address)
+        built_vault = build_vault_from_kong(kong_vault, fallback_by_address, kong_by_address)
         if built_vault is None:
             continue
         address = str(built_vault["address"]).lower()

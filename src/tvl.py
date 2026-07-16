@@ -45,7 +45,8 @@ def get_data() -> dict[str, Any]:
         wow_usd = (yearn_tvl - prev["tvl_usd"]) / prev["tvl_usd"] * 100
         wow_eth = (tvl_eth - prev["tvl_eth"]) / prev["tvl_eth"] * 100
         defi_wow = (defi_tvl - prev["defi_tvl_usd"]) / prev["defi_tvl_usd"] * 100
-        ya_wow = (ya_tvl - prev["ya_tvl_usd"]) / prev["ya_tvl_usd"] * 100
+        prev_ya_tvl = prev.get("ya_tvl_usd")
+        ya_wow = (ya_tvl - prev_ya_tvl) / prev_ya_tvl * 100 if prev_ya_tvl else None
     else:
         wow_usd = None
         wow_eth = None

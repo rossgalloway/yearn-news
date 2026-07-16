@@ -79,6 +79,62 @@ class VaultsKongSourcingTests(unittest.TestCase):
         self.assertAlmostEqual(result["historical_apy"], 2.78, places=6)
         self.assertEqual(result["chain"], "mainnet")
 
+    def test_ybold_uses_ysybold_as_performance_source(self) -> None:
+        ybold = {
+            "name": "Yearn BOLD",
+            "address": "0x9F4330700a36B29952869fac9b33f45EEdd8A3d8",
+            "chainId": 1,
+            "kind": "Multi Strategy",
+            "type": "Yearn Vault",
+            "v3": True,
+            "origin": "yearn",
+            "isHighlighted": True,
+            "symbol": "yBOLD",
+            "asset": {"symbol": "BOLD"},
+            "tvl": 4_810_137.94,
+            "isHidden": False,
+            "isRetired": False,
+            "performance": {
+                "estimated": {},
+                "oracle": {"netAPY": 0.05205197644202464},
+                "historical": {"monthlyNet": None, "net": None},
+            },
+        }
+        ysybold = {
+            "name": "Staked yBOLD",
+            "address": "0x23346B04a7f55b8760E5860AA5A77383D63491cD",
+            "chainId": 1,
+            "kind": "Single Strategy",
+            "type": "Yearn Vault",
+            "v3": True,
+            "origin": "yearn",
+            "isHighlighted": False,
+            "symbol": "ysyBOLD",
+            "asset": {"symbol": "yBOLD"},
+            "tvl": 4_724_851.79,
+            "isHidden": False,
+            "isRetired": False,
+            "performance": {
+                "estimated": {},
+                "oracle": {"netAPY": 0.04672945252193461},
+                "historical": {"monthlyNet": 0.09812814940914305, "net": 0.091},
+            },
+        }
+
+        result = vaults.build_vault_from_kong(
+            ybold,
+            fallback_by_address={},
+            kong_by_address={str(ysybold["address"]).lower(): ysybold},
+        )
+
+        self.assertIsNotNone(result)
+        assert result is not None
+        self.assertEqual(result["name"], "Yearn BOLD")
+        self.assertEqual(result["address"], ybold["address"])
+        self.assertAlmostEqual(result["tvl_usd"], 4_810_137.94, places=6)
+        self.assertAlmostEqual(result["apr"], 4.672945252193461, places=6)
+        self.assertAlmostEqual(result["historical_apy"], 9.812814940914305, places=6)
+
     def test_katana_kong_apy_uses_estimated_apy_when_present_without_double_counting_rewards(self) -> None:
         kong_vault = {
             "name": "vbUSDT yVault",

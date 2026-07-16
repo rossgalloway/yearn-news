@@ -36,7 +36,9 @@ LIQUID_LOCKERS = """
 # ALPHA CORNER
 # ------------------------------------------------------------
 ALPHA = """
-vbUSDC shares are not 1:1 with USDC.<br>https://x.com/yearnfi/status/2064348424242340024
+Risk monitoring is live.<br>https://x.com/yearnfi/status/2074841004616929597
+
+yvUSD is routing stablecoin yield across chains.<br>https://x.com/yearnfi/status/2077053070890999826
 """
 
 # ------------------------------------------------------------
