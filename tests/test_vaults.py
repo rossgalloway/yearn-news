@@ -13,7 +13,7 @@ import vaults
 
 
 class VaultsKongSourcingTests(unittest.TestCase):
-    def test_katana_kong_apy_and_historical_add_rewards_on_top_of_base_apy(self) -> None:
+    def test_katana_kong_apy_and_historical_ignore_native_and_fixed_rate_rewards(self) -> None:
         kong_vault = {
             "name": "AUSD yVault",
             "address": "0x93Fec6639717b6215A48E5a72a162C50DCC40d68",
@@ -45,8 +45,8 @@ class VaultsKongSourcingTests(unittest.TestCase):
 
         self.assertIsNotNone(result)
         assert result is not None
-        self.assertAlmostEqual(result["apr"], 3.33973, places=6)
-        self.assertAlmostEqual(result["historical_apy"], 46.65715, places=6)
+        self.assertAlmostEqual(result["apr"], 0.10258, places=6)
+        self.assertAlmostEqual(result["historical_apy"], 43.42, places=6)
         self.assertEqual(result["chain"], "katana")
 
     def test_non_katana_kong_apy_uses_estimated_apy_before_oracle_net_apy(self) -> None:
@@ -117,7 +117,11 @@ class VaultsKongSourcingTests(unittest.TestCase):
             "performance": {
                 "estimated": {},
                 "oracle": {"netAPY": 0.04672945252193461},
-                "historical": {"monthlyNet": 0.09812814940914305, "net": 0.091},
+                "historical": {
+                    "weeklyNet": 0.087654321,
+                    "monthlyNet": 0.09812814940914305,
+                    "net": 0.091,
+                },
             },
         }
 
@@ -132,10 +136,25 @@ class VaultsKongSourcingTests(unittest.TestCase):
         self.assertEqual(result["name"], "Yearn BOLD")
         self.assertEqual(result["address"], ybold["address"])
         self.assertAlmostEqual(result["tvl_usd"], 4_810_137.94, places=6)
-        self.assertAlmostEqual(result["apr"], 4.672945252193461, places=6)
+        self.assertAlmostEqual(result["apr"], 8.7654321, places=6)
         self.assertAlmostEqual(result["historical_apy"], 9.812814940914305, places=6)
 
-    def test_katana_kong_apy_uses_estimated_apy_when_present_without_double_counting_rewards(self) -> None:
+    def test_ybold_falls_back_to_preferred_apy_when_weekly_history_is_missing(self) -> None:
+        performance_source = {
+            "performance": {
+                "estimated": {},
+                "oracle": {"netAPY": 0.04672945252193461},
+                "historical": {"weeklyNet": None},
+            }
+        }
+
+        weekly_apy = vaults.resolve_ybold_weekly_apy_pct(performance_source)
+        fallback_apy, _ = vaults.resolve_kong_preferred_apy_pct(performance_source)
+
+        self.assertIsNone(weekly_apy)
+        self.assertAlmostEqual(fallback_apy or 0.0, 4.672945252193461, places=6)
+
+    def test_katana_kong_apy_adds_only_app_rewards_to_estimated_and_historical_base(self) -> None:
         kong_vault = {
             "name": "vbUSDT yVault",
             "address": "0x9A6bd7B6Fd5C4F87eb66356441502fc7dCdd185B",
@@ -154,6 +173,7 @@ class VaultsKongSourcingTests(unittest.TestCase):
                 "estimated": {
                     "apy": 0.0494,
                     "components": {
+                        "katanaNativeYield": 0.40,
                         "katanaAppRewardsAPR": 0.0100,
                         "fixedRateKatanaRewards": 0.0200,
                     },
@@ -167,8 +187,8 @@ class VaultsKongSourcingTests(unittest.TestCase):
 
         self.assertIsNotNone(result)
         assert result is not None
-        self.assertAlmostEqual(result["apr"], 4.94, places=6)
-        self.assertAlmostEqual(result["historical_apy"], 5.68, places=6)
+        self.assertAlmostEqual(result["apr"], 5.94, places=6)
+        self.assertAlmostEqual(result["historical_apy"], 3.68, places=6)
         self.assertEqual(result["chain"], "katana")
 
     def test_build_vault_from_kong_uses_onchain_fallback_when_kong_apy_missing(self) -> None:
@@ -253,12 +273,24 @@ class VaultsKongSourcingTests(unittest.TestCase):
         self.assertIsNotNone(locked_result)
         assert unlocked_result is not None
         assert locked_result is not None
+        self.assertEqual(unlocked_result["name"], "Unlocked yvUSD")
+        self.assertEqual(locked_result["name"], "Locked yvUSD")
         self.assertAlmostEqual(unlocked_result["apr"], 4.306628045504346, places=6)
         self.assertAlmostEqual(locked_result["apr"], 5.553174142860273, places=6)
 
+    def test_unlocked_yvusd_display_name_is_shared_with_onchain_fallback(self) -> None:
+        self.assertEqual(
+            vaults.resolve_vault_display_name(vaults.YVUSD_UNLOCKED_ADDRESS, "yvUSD"),
+            "Unlocked yvUSD",
+        )
+        self.assertEqual(
+            vaults.resolve_vault_display_name(vaults.YVUSD_LOCKED_ADDRESS, "Locked yvUSD"),
+            "Locked yvUSD",
+        )
+
     def test_get_vault_bucket_treats_yvusd_variants_as_stablecoin(self) -> None:
         self.assertEqual(vaults.get_vault_bucket("Locked yvUSD", "yvUSD", None), "usd")
-        self.assertEqual(vaults.get_vault_bucket("yvUSD", "USDC", None), "usd")
+        self.assertEqual(vaults.get_vault_bucket("Unlocked yvUSD", "USDC", None), "usd")
 
     def test_build_vault_from_kong_requires_highlighted_flag_for_non_yvusd_vaults(self) -> None:
         kong_vault = {

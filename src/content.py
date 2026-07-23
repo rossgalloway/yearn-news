@@ -22,9 +22,13 @@ VAULTS = """
 # ALPHA CORNER
 # ------------------------------------------------------------
 ALPHA = """
-Risk monitoring is live.<br>https://x.com/yearnfi/status/2074841004616929597
+Yearn turns six.<br>https://x.com/yearnfi/status/2078125075119898630
 
-yvUSD is routing stablecoin yield across chains.<br>https://x.com/yearnfi/status/2077053070890999826
+yBOLD rates are looking strong.<br>https://x.com/yearnfi/status/2079196282883575942
+
+Something new is coming: yTranche.<br>https://x.com/yearnfi/status/2079609058106224706
+
+Yearn vaults are heading to Money League—and Merit codes are live.<br>https://x.com/yearnfi/status/2079683083947979031
 """
 
 # ------------------------------------------------------------

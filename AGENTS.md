@@ -42,9 +42,11 @@ docker exec objective_robinson bash -c "cd /projects && uv run python src/genera
 
 - Newsletter vault rows should use Kong as the primary source.
 - Kong APY for output should prefer `performance.estimated.apy` when present, then fall back to `performance.oracle.netAPY`.
-- For Katana vaults without `performance.estimated.apy`, add reward components on top of the oracle-derived base.
+- For Katana vaults, mirror yearn.fi by using the Kong forward estimated/oracle APY as the base and adding only `performance.estimated.components.katanaAppRewardsAPR`.
+- Do not add Katana native yield or fixed-rate market rewards to the displayed estimated APY.
+- For yBOLD, use Staked yBOLD's `performance.historical.weeklyNet` as the estimated APY, falling back to the standard estimated/oracle path when it is missing.
 - Show Kong `performance.historical.monthlyNet` as the separate Historical APY value, falling back to `performance.historical.net` only when monthly net is missing.
-- For Katana vault Historical APY, add reward components on top of the Kong historical base, mirroring the estimated APY fallback behavior.
+- For Katana vault Historical APY, add only `performance.estimated.components.katanaAppRewardsAPR` on top of the Kong historical base.
 - Do not use Kong top-level `apy.net` or `performance.historical` for sorting or the primary vault row APY display.
 - If Kong is unavailable or a vault is missing usable Kong APY/TVL data, fall back to the direct query path in `src/vaults.py`.
 - Vault row text in the generated article should say `APY`, not `APR`.
