@@ -5,8 +5,9 @@ Use this checklist to produce a weekly issue without relying on knowledge from a
 ## 1. Choose the reporting window
 
 - Use the Monday of the current report week for the article title.
-- Use the start of the last full week as the default lower bound for editorial sources.
-- Record a different cutoff in your working notes if the editor requests one.
+- Find the last published Yearn News / The Blue Pill post and use its actual publication timestamp as the exclusive editorial lower bound, through the current generation time. This is typically about one week.
+- Record the publication URL, UTC timestamp, and search end time. The Monday in the article title is not the editorial cutoff. Honor an explicit editor-supplied window.
+- If the latest publication cannot be verified, flag the cutoff as unresolved. If timeline access is incomplete, flag collection as incomplete; do not claim there were no new posts.
 - Verify publication dates directly; do not rely only on search-result or profile ordering.
 
 The generator derives its title date automatically. Alpha-specific date and authorship rules live in [`tweet-alpha-workflow.md`](tweet-alpha-workflow.md).
@@ -74,7 +75,7 @@ uv run python src/generate.py
 
 Generation reads live APIs and onchain data, writes all publication formats, and updates `data/tvl_cache.json` for the current week.
 
-The yCRV and yYB week-over-week comparison comes directly from the RewardDistributor contracts. `data/ycrv_cache.json` and `data/yyb_cache.json` are legacy snapshots and are not part of the current generation path.
+The yCRV and yYB week-over-week comparison comes directly from the RewardDistributor contracts. The generator pairs their nearest native cycles and uses the newest pair whose two end timestamps have passed. During the Thursday gap between the yCRV and yYB cutoffs, both products remain on the prior matched pair instead of reporting an open yYB cycle. `data/ycrv_cache.json` and `data/yyb_cache.json` are legacy snapshots and are not part of the current generation path.
 
 ## 6. Review the article
 

@@ -425,6 +425,10 @@ class VaultsKongSourcingTests(unittest.TestCase):
 
 
 class GenerateFormattingTests(unittest.TestCase):
+    def test_fmt_approx_pct_keeps_small_changes_visible(self) -> None:
+        self.assertEqual(generate.fmt_approx_pct(-0.49), "~0.5%")
+        self.assertEqual(generate.fmt_approx_pct(1.2), "~1%")
+
     def test_format_report_period_uses_monday_date(self) -> None:
         monday = utils.get_report_monday(date(2026, 5, 22))
 

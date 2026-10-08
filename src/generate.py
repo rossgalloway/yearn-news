@@ -9,7 +9,8 @@ import tvl
 import vaults
 import ycrv
 import yyb
-from utils import fmt_usd, format_report_period, get_report_monday, get_week_and_year
+from reward_weeks import select_latest_closed_pair
+from utils import fmt_usd, format_report_period, get_report_monday, get_web3, get_week_and_year
 
 OUTPUT_FILE = Path(__file__).parent.parent / "output.md"
 X_ARTICLE_HTML_FILE = Path(__file__).parent.parent / "output-x-article.html"
@@ -37,6 +38,12 @@ def fmt_eth(val: float) -> str:
     return f"{val:,.0f} ETH"
 
 
+def fmt_approx_pct(val: float) -> str:
+    """Format approximate changes without rounding small moves to zero."""
+    precision = 1 if abs(val) < 1 else 0
+    return f"~{abs(val):.{precision}f}%"
+
+
 def render_glance(tvl_data: dict[str, Any]) -> str:
     lines = ["## Yearn at a glance"]
 
@@ -44,7 +51,7 @@ def render_glance(tvl_data: dict[str, Any]) -> str:
     if tvl_data["wow_usd_pct"] is not None:
         direction = "increased" if tvl_data["wow_usd_pct"] > 0 else "declined"
         lines.append(
-            f"Yearn TVL {direction} week-over-week by **~{abs(tvl_data['wow_usd_pct']):.0f}%**, "
+            f"Yearn TVL {direction} week-over-week by **{fmt_approx_pct(tvl_data['wow_usd_pct'])}**, "
             f"from **{fmt_usd(tvl_data['prev_tvl_usd'])}** (**{tvl_data['prev_tvl_eth']:,.0f} ETH**) "
             f"to **{fmt_usd(tvl_data['tvl_usd'])}** (**{tvl_data['tvl_eth']:,.0f} ETH**)."
         )
@@ -57,7 +64,7 @@ def render_glance(tvl_data: dict[str, Any]) -> str:
     if defi_wow is not None and tvl_data.get("prev_defi_tvl_usd"):
         direction = "increased" if defi_wow > 0 else "declined"
         lines.append(
-            f"Total DeFi TVL {direction} week-over-week by **~{abs(defi_wow):.0f}%**, "
+            f"Total DeFi TVL {direction} week-over-week by **{fmt_approx_pct(defi_wow)}**, "
             f"from **{fmt_usd(tvl_data['prev_defi_tvl_usd'])}** (**{fmt_eth(tvl_data['prev_defi_tvl_eth'])}**) "
             f"to **{fmt_usd(tvl_data['defi_tvl_usd'])}** (**{fmt_eth(tvl_data['defi_tvl_eth'])}**),"
         )
@@ -438,8 +445,14 @@ def generate() -> None:
 
     tvl_data = tvl.get_data()
     vaults_data = vaults.get_data()
-    ycrv_data = ycrv.get_data()
-    yyb_data = yyb.get_data()
+    report_timestamp = get_web3("mainnet").eth.get_block("latest")["timestamp"]
+    ycrv_week, yyb_week = select_latest_closed_pair(
+        primary_start_time=ycrv.REWARD_DISTRIBUTOR_START_TIME,
+        paired_start_time=yyb.REWARD_DISTRIBUTOR_START_TIME,
+        report_timestamp=report_timestamp,
+    )
+    ycrv_data = ycrv.get_data(ycrv_week)
+    yyb_data = yyb.get_data(yyb_week)
 
     sections = [
         render_overview(period, week, year),

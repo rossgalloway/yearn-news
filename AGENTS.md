@@ -87,7 +87,7 @@ Use `docs/weekly-generation-workflow.md` for the complete weekly source, generat
 
 Current expectations:
 
-- Use the start of the last full week as the lower bound unless the user gives a different date.
+- Use the actual publication timestamp of the last published Yearn News / The Blue Pill post as the lower bound, and search through the current generation time. This is typically about one week; do not use the Monday in the article title. If publication cannot be verified, flag the cutoff as unresolved rather than silently assuming a date.
 - Include Yearn-authored tweets and quote-tweets only.
 - Exclude vanilla retweets, low-context replies, and posts older than the cutoff.
 - Prefer short punchy blurbs plus raw X links.

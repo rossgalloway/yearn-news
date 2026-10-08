@@ -22,13 +22,13 @@ VAULTS = """
 # ALPHA CORNER
 # ------------------------------------------------------------
 ALPHA = """
-Yearn turns six.<br>https://x.com/yearnfi/status/2078125075119898630
+yvUSD uses automated leverage to boost yield. Here's how the loop works, risks included.<br>https://x.com/yearnfi/status/2103129075518976507
 
-yBOLD rates are looking strong.<br>https://x.com/yearnfi/status/2079196282883575942
+The risk team has been selected to provide risk analysis for Curve. Follow yRisk for updates.<br>https://x.com/yearnfi/status/2104566043859632408
 
-Something new is coming: yTranche.<br>https://x.com/yearnfi/status/2079609058106224706
+Stay informed about changes across 20+ DeFi protocols with Yearn's risk monitoring.<br>https://x.com/yearnfi/status/2104939005905379690
 
-Yearn vaults are heading to Money League—and Merit codes are live.<br>https://x.com/yearnfi/status/2079683083947979031
+Three chess Yearnaments this year: EthCC, ETHPrague, and ETHBelgrade. Where next?<br>https://x.com/yearnfi/status/2105290605861769542
 """
 
 # ------------------------------------------------------------

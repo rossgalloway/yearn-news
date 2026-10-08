@@ -4,10 +4,11 @@ from utils import get_web3, load_abi
 
 REWARD_DISTRIBUTOR_ADDRESS = "0xB226c52EB411326CdB54824a88aBaFDAAfF16D3d"
 YVCRVUSD2_ADDRESS = "0xBF319dDC2Edc1Eb6FDf9910E39b37Be221C8805F"
+REWARD_DISTRIBUTOR_START_TIME = 1717632455
 
 
-def get_data() -> dict[str, Any]:
-    """Fetch previous week's yCRV rewards from RewardDistributor."""
+def get_data(reporting_week: int) -> dict[str, Any]:
+    """Fetch a completed yCRV reward cycle and its prior cycle."""
     w3 = get_web3("mainnet")
 
     # Get reward distributor data
@@ -17,12 +18,10 @@ def get_data() -> dict[str, Any]:
         abi=rd_abi,
     )
 
-    current_week = rd_contract.functions.getWeek().call()
-    prev_week = current_week - 1
-    prev_prev_week = current_week - 2
+    prior_week = reporting_week - 1
 
-    reward_amount = rd_contract.functions.weeklyRewardAmount(prev_week).call()
-    prev_reward_amount = rd_contract.functions.weeklyRewardAmount(prev_prev_week).call()
+    reward_amount = rd_contract.functions.weeklyRewardAmount(reporting_week).call()
+    prev_reward_amount = rd_contract.functions.weeklyRewardAmount(prior_week).call()
 
     # Rewards are in yvcrvUSD-2 vault tokens (18 decimals)
     rewards_vault_tokens = reward_amount / 1e18
@@ -49,5 +48,5 @@ def get_data() -> dict[str, Any]:
         "rewards_crvusd": rewards_crvusd,
         "prev_rewards_crvusd": prev_rewards_crvusd,
         "wow_pct": wow_pct,
-        "distributor_week": prev_week,
+        "distributor_week": reporting_week,
     }

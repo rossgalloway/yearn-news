@@ -8,11 +8,15 @@ The Alpha Corner should include recent Yearn-authored tweets and quote-tweets th
 
 ## Date Window
 
-Use the start of the last full week as the lower bound unless the user gives a different date.
+Find the most recent published Yearn News / The Blue Pill post first. Use its actual publication timestamp as the exclusive lower bound and the current generation time as the upper bound, unless the user explicitly supplies another window. This is typically about one week before generation, but the verified publication time determines the cutoff.
 
-For example, during the May 22, 2026 run, the cutoff was May 11, 2026. Posts before that date were excluded even if they appeared in a mirror or old search result.
+Do not use the Monday printed in the article title, the start of the last full calendar week, or the local draft generation date. Record the previous publication URL, its UTC timestamp, and the search end time in the handoff or working notes. Exclude the previous newsletter post itself and items already covered in it.
 
-Always verify the post date. Do not trust profile page order alone.
+For the September 23, 2026 run, the verified prior publication is https://x.com/yearnfi/status/2100574708647256322, published September 17, 2026 at 13:16:51 UTC. Its title says “Week of September 14,” but the search begins after its September 17 publication.
+
+If the latest publication cannot be verified, report that the cutoff is unresolved. A date approximately seven days before generation may guide discovery, but must not be presented as a verified cutoff. If timeline access is incomplete, report collection as incomplete rather than interpreting missing search results as no new posts.
+
+Always verify each candidate's date and authorship. Do not trust profile page order alone.
 
 ## What Counts
 
@@ -32,7 +36,7 @@ The important distinction is authorship. If a mirror shows `yearn retweeted`, th
 
 ## Preferred Collection Flow
 
-1. Ask Hermes to pull Yearn tweets and quote-tweets for the target window.
+1. Identify and verify the latest published newsletter, then ask Hermes to pull Yearn tweets and quote-tweets strictly after its publication through the current generation time.
 2. If Hermes cannot access X directly, record that limitation and fall back to public sources.
 3. Check the Yearn profile mirror, such as `https://twstalker.com/yearnfi`, for recent visible posts.
 4. Use X oEmbed for individual post verification when possible:
@@ -95,7 +99,7 @@ Do not start blurbs with `Yearn <action>` unless it is truly the cleanest senten
 
 The blurb should be short and useful, not a summary of the whole post.
 
-## Current Example
+## Historical Example (Old Date-Window Rule)
 
 The May 22, 2026 run used these Alpha items:
 
