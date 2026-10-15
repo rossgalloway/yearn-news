@@ -213,5 +213,22 @@
     "tvl_eth": 99022.06081017319,
     "defi_tvl_usd": 94927088201.0,
     "ya_tvl_usd": 1397673253.3405352
+  },
+  {
+    "week": 40,
+    "year": 2026,
+    "tvl_usd": 204900000.0,
+    "tvl_eth": 80980.87755272849,
+    "defi_tvl_usd": 92243630668.0,
+    "ya_tvl_usd": 1358731245.5916035,
+    "methodology_note": "Editor-supplied $204.9M baseline under the new DeFiLlama methodology; ETH converted using the original week-40 ETH/USD rate."
+  },
+  {
+    "week": 41,
+    "year": 2026,
+    "tvl_usd": 202599651.95574564,
+    "tvl_eth": 86162.30464214347,
+    "defi_tvl_usd": 88436341703.0,
+    "ya_tvl_usd": 1257796802.0329435
   }
 ]

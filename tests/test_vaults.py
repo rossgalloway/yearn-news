@@ -560,6 +560,19 @@ class GenerateFormattingTests(unittest.TestCase):
             "in the prior week, for a week-over-week change of **-100.0%**",
         )
 
+    def test_yyb_editorial_copy_applies_only_to_its_issue(self) -> None:
+        rewards = {"rewards_crvusd": 0.0, "prev_rewards_crvusd": 0.0, "wow_pct": None}
+        current = generate.render_liquid_lockers(rewards, rewards, "Week of October 12, 2026")
+        following = generate.render_liquid_lockers(rewards, rewards, "Week of October 19, 2026")
+
+        self.assertIn(
+            "**yYB:** This week's yYB rewards were below the claiming threshold so stakers received "
+            "0.00 crvUSD rewards for a second week. The rewards from this week will roll into next week.",
+            current,
+        )
+        self.assertNotIn("claiming threshold", following)
+        self.assertIn("**yYB:** This week yYB stakers received **0.00 crvUSD** rewards", following)
+
     def test_render_x_article_fragment_converts_markdown_subheadings(self) -> None:
         fragment = generate.render_x_article_fragment("## Liquid Lockers\n### yCRV\nRewards copy.\n")
 

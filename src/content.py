@@ -18,17 +18,23 @@ Welcome to **The Blue Pill** for *{period}*. A weekly update covering what's bee
 VAULTS = """
 """
 
+# Editorial reward explanations apply only to the specified issue.
+YYB_REWARDS_BY_PERIOD = {
+    "Week of October 12, 2026": (
+        "This week's yYB rewards were below the claiming threshold so stakers received "
+        "0.00 crvUSD rewards for a second week. The rewards from this week will roll into next week."
+    ),
+}
+
 # ------------------------------------------------------------
 # ALPHA CORNER
 # ------------------------------------------------------------
 ALPHA = """
-yvUSD uses automated leverage to boost yield. Here's how the loop works, risks included.<br>https://x.com/yearnfi/status/2103129075518976507
+ysyBOLD lands on FiRM: compounding BOLD yield meets fixed-rate DOLA borrowing.<br>https://x.com/yearnfi/status/2110081092480889205
 
-The risk team has been selected to provide risk analysis for Curve. Follow yRisk for updates.<br>https://x.com/yearnfi/status/2104566043859632408
+Dig into the USDY and hyAUSD risk reports highlighted this week.<br>https://x.com/yearnfi/status/2109997080681058605
 
-Stay informed about changes across 20+ DeFi protocols with Yearn's risk monitoring.<br>https://x.com/yearnfi/status/2104939005905379690
-
-Three chess Yearnaments this year: EthCC, ETHPrague, and ETHBelgrade. Where next?<br>https://x.com/yearnfi/status/2105290605861769542
+Longer reward-claim periods and discretionary fund accounting were up for stYFI votes. The announced deadline has passed.<br>https://x.com/yearnfi/status/2109755998986789352
 """
 
 # ------------------------------------------------------------

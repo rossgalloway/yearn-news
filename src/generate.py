@@ -203,11 +203,12 @@ def render_liquid_locker_row(name: str, data: dict[str, Any]) -> str:
     )
 
 
-def render_liquid_lockers(ycrv_data: dict[str, Any], yyb_data: dict[str, Any]) -> str:
+def render_liquid_lockers(ycrv_data: dict[str, Any], yyb_data: dict[str, Any], period: str | None = None) -> str:
     lines = ["## Liquid Lockers"]
     lines.append(render_liquid_locker_row("yCRV", ycrv_data))
     lines.append("")
-    lines.append(render_liquid_locker_row("yYB", yyb_data))
+    yyb_copy = content.YYB_REWARDS_BY_PERIOD.get(period) if period else None
+    lines.append(f"**yYB:** {yyb_copy}" if yyb_copy else render_liquid_locker_row("yYB", yyb_data))
     return "\n".join(lines)
 
 
@@ -458,7 +459,7 @@ def generate() -> None:
         render_overview(period, week, year),
         render_glance(tvl_data),
         render_vaults(vaults_data),
-        render_liquid_lockers(ycrv_data, yyb_data),
+        render_liquid_lockers(ycrv_data, yyb_data, period),
         render_alpha(),
         render_disclaimer(),
         render_sign_off(),

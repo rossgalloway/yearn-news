@@ -1,0 +1,13 @@
+[Unit]
+Description=Research, generate, and validate the weekly Yearn News draft
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/dev/raaaws/yearn-news
+Environment=PATH=/home/dev/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=UV_CACHE_DIR=/tmp/yearn-news-uv-cache
+UMask=0077
+ExecStart=/usr/bin/python3 /home/dev/raaaws/yearn-news/automation/run_weekly.py
+TimeoutStartSec=2h
